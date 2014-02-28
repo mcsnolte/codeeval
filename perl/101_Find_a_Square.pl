@@ -8,6 +8,8 @@ square.
 	x0,y0 ------ x1,y1
 	  |            |
 	  |            |
+	  |            |
+	  |            |
 	x3,y3 ------ x2,y2
 
 =cut
@@ -26,13 +28,24 @@ while (<DATA>) {
 	my $lr_cross = sqrt( ( $x0 - $x2 )**2 + ( $y0 - $y2 )**2 );
 	my $rl_cross = sqrt( ( $x1 - $x3 )**2 + ( $y1 - $y3 )**2 );
 
-	if ( $n_edge == $e_edge && $s_edge == $w_edge && $s_edge == $n_edge && $lr_cross == $rl_cross ) {
+	# sort so that we can ignore order of coords
+	my @s = sort { $a <=> $b } ( $n_edge, $e_edge, $s_edge, $w_edge, $lr_cross, $rl_cross );
+
+	if (
+		$n_edge > 0          # points can't be on top of each other
+		&& $s[0] == $s[1]    # 1 == 2
+		&& $s[1] == $s[2]    # 2 == 3
+		&& $s[2] == $s[3]    # 3 == 4
+		&& $s[4] == $s[5]    # diagonals
+	  )
+	{
 		print "true\n";
 	}
 	else {
 		print "false\n";
 	}
 }
+
 exit(0);
 
 __DATA__
