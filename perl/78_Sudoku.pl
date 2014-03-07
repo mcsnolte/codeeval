@@ -37,11 +37,13 @@ use warnings;
 my $size;
 my @num;
 my $key;
+my $bkey;
 
 while (<DATA>) {
 	chomp;
 	( $size, @num ) = split /\D/;
 	$key = join( '', 1 .. $size );
+	$bkey = ( 2**$size ) - 1;
 
 	if ( check_rows() && check_cols() && check_grids() ) {
 		print "True\n";
@@ -55,7 +57,12 @@ sub check_rows {
 	for my $r ( 0 .. $size - 1 ) {
 		my $start = $r * $size;
 		my $end   = $start + $size - 1;
-		return 0 unless $key eq join( '', sort { $a <=> $b } @num[ $start .. $end ] );
+
+		#return 0 unless $key eq join( '', sort { $a <=> $b } @num[ $start .. $end ] );
+
+		my $test = $bkey;
+		$test ^= 2**( $_ - 1 ) for @num[ $start .. $end ];
+		return 0 unless $test == 0;
 	}
 	return 1;
 }
@@ -63,7 +70,12 @@ sub check_rows {
 sub check_cols {
 	for my $c ( 0 .. $size - 1 ) {
 		my @p = map { $c + $_ * $size } ( 0 .. $size - 1 );
-		return 0 unless $key eq join( '', sort { $a <=> $b } @num[@p] );
+
+		#return 0 unless $key eq join( '', sort { $a <=> $b } @num[@p] );
+
+		my $test = $bkey;
+		$test ^= 2**( $_ - 1 ) for @num[@p];
+		return 0 unless $test == 0;
 	}
 	return 1;
 }
@@ -85,7 +97,11 @@ sub check_grids {
 				my $g0 = $gr0 + $r * $size;    # start of each grid row
 				push @p, ( $g0 .. $g0 + $sq - 1 );
 			}
-			return 0 unless $key eq join( '', sort { $a <=> $b } @num[@p] );
+
+			#return 0 unless $key eq join( '', sort { $a <=> $b } @num[@p] );
+			my $test = $bkey;
+			$test ^= 2**( $_ - 1 ) for @num[@p];
+			return 0 unless $test == 0;
 		}
 	}
 	return 1;
